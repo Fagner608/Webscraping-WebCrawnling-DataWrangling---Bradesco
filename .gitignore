@@ -1,0 +1,11 @@
+/.vscode
+*__pycache__
+*.log
+*.xlsx
+*.csv
+tmp/*
+/download
+/data
+*ipynb
+/.ipynb_checkpoints
+.venv
