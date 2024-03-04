@@ -19,8 +19,10 @@ import calendar
 # classe para acesar
 class openBrowser():
 
-    def __init__(self) -> None:
+    def __init__(self, user_credencials: dict = dotenv_values("./data/.env")) -> WebDriver:
         self.__mkDirDownload()
+        self.login = user_credencials['LOGIN']
+        self.password = user_credencials['PASSWORD']
         
 
     def __mkDirDownload(self) -> None:
@@ -41,17 +43,18 @@ class openBrowser():
         
         driver.maximize_window()
         driver.get("https://www.intergrall.com.br/callcenter/cc_login.php")
-        WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#login"))).send_keys("bpro44055")
-        WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#password"))).send_keys("Agil@b3572")
+        WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#login"))).send_keys(self.login)
+        WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#password"))).send_keys(self.password)
         WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, "//input[@id = 'loginBtn']"))).click()
         try:
             WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '#messageError')))
-            WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#password"))).send_keys("Agil@b3572")
+            WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#password"))).send_keys(self.password)
             WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.XPATH, "//input[@id = 'loginBtn']"))).click()
         except TimeoutException:
             pass
 
         return driver
+    
     
 
 
