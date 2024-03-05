@@ -22,9 +22,9 @@ from dotenv import dotenv_values
 class openBrowser():
 
     def __init__(self, user_credencials: dict = dotenv_values("./data/.env")) -> WebDriver:
-        self.__mkDirDownload()
+        self.password = user_credencials['PASSWORD_LOGIN']
         self.login = user_credencials['LOGIN']
-        self.password = user_credencials['PASSWORD']
+        self.__mkDirDownload()
         
 
     def __mkDirDownload(self) -> None:

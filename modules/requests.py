@@ -14,6 +14,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import *
 from selenium.webdriver import Keys, ActionChains
 import calendar
+from dotenv import dotenv_values
 
 
 # classe para acesar

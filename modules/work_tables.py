@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import date
 from os import path, makedirs
 from shutil import move, copy
+from json import load
 
 
 #  classe para carregar relatórios
@@ -11,19 +12,24 @@ class wor_tables():
     def __init__(self, date_work: date):
         self.date_work = date_work
         self.processing = False
+        self.__load_tables_codes()
         self.read_reports()
         self.production_report_to_storm()
         self.comission_repor_to_storm()
         self.zz()
 
 
+    def __load_tables_codes(self):
+        with open("./data/tables_cod.json", mode = 'r', encoding ='utf-8') as fp:
+            dados = load(fp)
+            table_code = dados['orgao']
+            setattr(self, 'tables_code', table_code)
+
 
     def read_reports(self):
             path_to_read = f"./relatórios/{self.date_work.year}/{self.date_work.month}/relatorio_{self.date_work}.csv"
-                      
             
-            print(path_to_read)
-            print(path.exists(path_to_read))
+            tables_code = getattr(self, 'tables_code')
             if path.exists(path_to_read):
                 dados = pd.read_csv(path_to_read, encoding = 'latin-1', sep = ';')
                 dados = dados[~dados['CONTRATO'].isna()]
@@ -34,6 +40,8 @@ class wor_tables():
                 dados['VALOR BRUTO'] = dados['VALOR BRUTO'].map(lambda x: str(x).replace(".", ","))
                 dados['VALOR LANÇAMENTO'] = dados['VALOR LANÇAMENTO'].map(lambda x: str(x).replace(".", ","))
                 dados = dados[~dados['VALOR LANÇAMENTO'].str.contains("0|0.0")]
+                dados['CÓDIGO PRODUTO'] = dados['CÓDIGO PRODUTO'].map(lambda x: str(int(x)))
+                dados['CÓDIGO PRODUTO'] = dados['CÓDIGO PRODUTO'].map(tables_code)
                 setattr(self, 'report', dados)
                 self.processing = True
 
@@ -66,7 +74,7 @@ class wor_tables():
                                 'CONTRATO',
                                 'DATA BASE CONTRATO',
                                 'NOME CONVÊNIO',
-                                'CÓDIGO TABELA',
+                                'CÓDIGO PRODUTO',
                                 'PRAZO CONTRATO',
                                 'VALOR BRUTO',
                                 'REMUNERAÇÃO VALOR PAGO',
