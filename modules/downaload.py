@@ -52,8 +52,6 @@ class download_repors():
 
     def download_reports(self):
         time.sleep(3)
-        # tabela_html = self.driver.find_element(By.CSS_SELECTOR, '.table')
-        # tabela_html = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.table')))
         tabela_html = WebDriverWait(self.driver, 20).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.table')))
         linhas = tabela_html.find_elements(By.CSS_SELECTOR, 'tr')
 

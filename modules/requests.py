@@ -20,7 +20,7 @@ from dotenv import dotenv_values
 # classe para acesar
 class openBrowser():
 
-    def __init__(self, user_credencials: dict = dotenv_values("./data/.env")) -> WebDriver:
+    def __init__(self, user_credencials: dict = dotenv_values("../data/.env")) -> WebDriver:
         self.__mkDirDownload()
         self.login = user_credencials['LOGIN']
         self.password = user_credencials['PASSWORD']
@@ -134,17 +134,18 @@ class get_tables():
                 if not found_first_day:
                     day = j.find_elements(By.CSS_SELECTOR, 'td')
                     for k in day:
+                        print(k.text)
                         if k.text.isdigit() and int(k.text) == 1:
                             found_first_day = True
-                            break  
-                else:
-                    day = j.find_elements(By.CSS_SELECTOR, 'td')
-                    for k in day:
-                        if k.text.isdigit():
-                            if str(k.text) == str(date.day):
-                                self.driver.execute_script("arguments[0].click();", k)
-                                self.driver.find_element(By.CSS_SELECTOR, '#cod_contrato').click()
-                                return
+                            day = j.find_elements(By.CSS_SELECTOR, 'td')
+                            if k.text.isdigit():
+                                print(k)
+                                if str(k.text) == str(date.day):
+                                    self.driver.execute_script("arguments[0].click();", k)
+                                    self.driver.find_element(By.CSS_SELECTOR, '#cod_contrato').click()
+                                    return
+                        else: continue
+                            
 
 
 

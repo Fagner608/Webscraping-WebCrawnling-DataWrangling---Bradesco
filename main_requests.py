@@ -4,7 +4,7 @@ import datetime
 
 def main():
 
-    date = datetime.date.today() - datetime.timedelta(days = 15)
+    date = datetime.date.today() - datetime.timedelta(days = 2)
     while date < datetime.date.today():
         teste = requests.get_tables(downaload.openBrowser().initialize_driver(), date = date) 
         print("Requisição do dia: ", date)

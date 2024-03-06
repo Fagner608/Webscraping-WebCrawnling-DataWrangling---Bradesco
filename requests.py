@@ -22,6 +22,7 @@ from dotenv import dotenv_values
 class openBrowser():
 
     def __init__(self, user_credencials: dict = dotenv_values("./data/.env")) -> WebDriver:
+        print(user_credencials)
         self.password = user_credencials['PASSWORD_LOGIN']
         self.login = user_credencials['LOGIN']
         self.__mkDirDownload()

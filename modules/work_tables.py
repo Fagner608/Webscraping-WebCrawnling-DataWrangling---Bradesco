@@ -12,12 +12,18 @@ class wor_tables():
     def __init__(self, date_work: date):
         self.date_work = date_work
         self.processing = False
+        self.propostas()
         self.__load_tables_codes()
         self.read_reports()
         self.production_report_to_storm()
         self.comission_repor_to_storm()
         self.zz()
 
+
+    def propostas(self):
+        zz = pd.read_excel("../zz_Bradesco.xlsx")
+        propostas = zz.PROPOSTA.to_list()
+        setattr(self, 'propostass', propostas)
 
     def __load_tables_codes(self):
         with open("./data/tables_cod.json", mode = 'r', encoding ='utf-8') as fp:
@@ -28,22 +34,26 @@ class wor_tables():
 
     def read_reports(self):
             path_to_read = f"./relatórios/{self.date_work.year}/{self.date_work.month}/relatorio_{self.date_work}.csv"
-            
+            propostas = getattr(self, 'propostas')
             tables_code = getattr(self, 'tables_code')
             if path.exists(path_to_read):
                 dados = pd.read_csv(path_to_read, encoding = 'latin-1', sep = ';')
                 dados = dados[~dados['CONTRATO'].isna()]
-                dados.CONTRATO = dados.CONTRATO.astype(dtype = int)
-                dados['PRAZO CONTRATO'] = dados['PRAZO CONTRATO'].astype(dtype = int)
-                dados['CÓDIGO DE USUARIO'] = dados['CÓDIGO DE USUARIO'].astype(dtype = int)
-                dados['CPF CLIENTE'] = dados['CPF CLIENTE'].astype(dtype = int)
-                dados['VALOR BRUTO'] = dados['VALOR BRUTO'].map(lambda x: str(x).replace(".", ","))
-                dados['VALOR LANÇAMENTO'] = dados['VALOR LANÇAMENTO'].map(lambda x: str(x).replace(".", ","))
-                dados = dados[~dados['VALOR LANÇAMENTO'].str.contains("0|0.0")]
-                dados['CÓDIGO PRODUTO'] = dados['CÓDIGO PRODUTO'].map(lambda x: str(int(x)))
-                dados['CÓDIGO PRODUTO'] = dados['CÓDIGO PRODUTO'].map(tables_code)
-                setattr(self, 'report', dados)
-                self.processing = True
+                
+                dados = dados[~dados.CONTRATO.isin(propostas)]
+
+                if not dados.empty:
+                    dados.CONTRATO = dados.CONTRATO.astype(dtype = int)
+                    dados['PRAZO CONTRATO'] = dados['PRAZO CONTRATO'].astype(dtype = int)
+                    dados['CÓDIGO DE USUARIO'] = dados['CÓDIGO DE USUARIO'].astype(dtype = int)
+                    dados['CPF CLIENTE'] = dados['CPF CLIENTE'].astype(dtype = int)
+                    dados['VALOR BRUTO'] = dados['VALOR BRUTO'].map(lambda x: str(x).replace(".", ","))
+                    dados['VALOR LANÇAMENTO'] = dados['VALOR LANÇAMENTO'].map(lambda x: str(x).replace(".", ","))
+                    dados = dados[~dados['VALOR LANÇAMENTO'].str.contains("0|0.0")]
+                    dados['CÓDIGO PRODUTO'] = dados['CÓDIGO PRODUTO'].map(lambda x: str(int(x)))
+                    dados['CÓDIGO PRODUTO'] = dados['CÓDIGO PRODUTO'].map(tables_code)
+                    setattr(self, 'report', dados)
+                    self.processing = True
 
 
     def production_report_to_storm(self):
@@ -74,7 +84,7 @@ class wor_tables():
                                 'CONTRATO',
                                 'DATA BASE CONTRATO',
                                 'NOME CONVÊNIO',
-                                'CÓDIGO PRODUTO',
+                                'CÓDIGO TABELA',
                                 'PRAZO CONTRATO',
                                 'VALOR BRUTO',
                                 'REMUNERAÇÃO VALOR PAGO',
@@ -85,7 +95,7 @@ class wor_tables():
                                     
                                 ]]
             production_report.insert(2, 'BANCO', 'BANCO BRADESCO')
-            production_report.insert(5, 'TIPO DE OPERACAO', '')
+            production_report.insert(5, 'TIPO DE OPERACAO', dados['CÓDIGO PRODUTO'])
             production_report.insert(7, 'VALOR PARCELAS', '')
             production_report.insert(10, 'VALOR QUITAR', '')
             production_report.insert(12, 'SITUACAO', 'PAGO')
